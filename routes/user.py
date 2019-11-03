@@ -191,3 +191,105 @@ def getUser(uid = None):
             "message": "{0}".format(e)
         }, 400
   
+  
+
+
+#   //////////////
+@routes.route('/getQuestions', methods=['GET'])
+def getQuestions():
+    try:      
+        # get questions
+        questions = db.reference(path='questions').get()
+
+        print('user',userData)
+        return {
+            "success": True,
+            "questions": questions
+        }, 200
+    except Exception as e:
+        return {
+            "success": False,
+            "message": "{0}".format(e)
+        }, 400
+
+
+
+#**************
+@routes.route('/users/answersOfQuestions/<uid>', methods=['POST'])
+def answersOfQuestions(uid = None):
+    answers = request.json.get('answers')
+    maxima=-1     #highest value in answers
+    
+    for key, value in answers:
+        if (maxima<value):
+            maxima=value
+    
+    x = maxima  # highest percentage skill according to test  
+   
+    Naturalist = answers.Naturalist 
+    Musical = answers.Musical
+    Logical = answers.logical
+    Interpersonal = answers.Interpersonal 
+    Kinesthetic = answers.Kinesthetic 
+    Verbal = answers.Verbal
+    visual = answers.visual
+    
+   
+    farwlaya = ""
+    if(x == Naturalist):
+        if(Musical >0.5 and Logical > 0.5 and Kinesthetic > 0.5):
+            farwlaya = "Data Administration"
+        elif(Interpersonal > 0.5 and Verbal > 0.5 and Intrapersonal > 0.5):
+            farwlaya="Information Technology"
+        else: 
+            farwlaya ="Network Engineer"
+    elif (x == Musical):
+        if(Naturalist > 0.5 and Logical > 0.5 and Kinesthetic > 0.5 ):
+            farwlaya ="Data Administration"
+        elif(Naturalist > 0.5 and Logical > 0.5):
+            farwlaya ="Network Engineer"
+        else: 
+            farwlaya ="Mobile Development"
+    elif (x == Logical):
+        if(Naturalist > 0.5 and Musical > 0.5 and Kinesthetic > 0.5):
+            farwlaya ="Data Administration"
+        else:
+            farwlaya ="Network Engineer"
+    elif (x == Interpersonal):
+        if(Naturalist > 0.5 and Verbal > 0.5 and Intrapersonal > 0.5):
+            farwlaya ="Information Technology"
+        elif(Intrapersonal > 0.5 and Kinesthetic >0.5 and Visual > 0.5):
+            farwlaya ="Ui Developer"
+        else: 
+            farwlaya ="Web Developer"
+    elif (x == Kinesthetic):
+        if(Intrapersonal > 0.5 and Interpersonal > 0.5 and Visual > 0.5):
+            farwlaya ="Ui Developer"
+        else:
+            farwlaya ="Data Administration"
+    elif (x == Verbal):
+        if(Naturalist > 0.5 and Interpersonal > 0.5 and Intrapersonal > 0.5):
+            farwlaya ="Information Technology"
+        elif(Interpersonal > 0.5 and Visual > 0.5):
+            farwlaya ="Web Developer"
+        else: 
+            farwlaya ="Mobile Development"
+    elif (x == Intrapersonal):
+        if(Naturalist > 0.5 and Interpersonal > 0.5 and Verbal > 0.5):
+            farwlaya ="Information Technology"
+        else: 
+            farwlaya ="Ui Developer"
+    elif (x == Visual):
+        if(Verbal > 0.5 and Musical >0.5 ):
+            farwlaya ="Mobile Development"
+        elif(Intrapersonal > 0.5 and Interpersonal > 0.5 and Kinesthetic > 0.5):
+            farwlaya ="Ui Developer"
+        else: 
+            farwlaya ="Web Developer"
+    else: 
+        farwlaya ="Take Quiz Again"
+
+    return {
+        "success": True,
+        "response": farwlaya
+    }, 200
