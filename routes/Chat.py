@@ -53,3 +53,19 @@ def createMsg():
         "message": "Message created {0}".format(roomKey),
     }
 
+
+#chat list
+@routes.route('/chat/chatList/<uid>', methods=['GET'])
+def chatlist(uid):
+    try:
+        userMessage = db.reference(path='users/{0}/messages'.format(uid)).get()
+
+        return {
+            "success": True,
+            "message": userMessage
+        }, 200
+    except Exception as NMN:
+        return {
+            "success": False,
+            "message": "{0}".format(NMN)
+        }, 400  
