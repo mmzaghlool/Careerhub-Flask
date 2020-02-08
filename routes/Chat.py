@@ -16,7 +16,7 @@ def createMsg():
     if((senderUid==None) | (receiverUid==None) | (message==None) | (timestamp==None)):
         return {
             "success":False,
-            "message":"ya 7ywan eb3at eldata kolha"
+            "message":"Missing data"
         }
     
     # if (roomKey == None):
@@ -53,3 +53,8 @@ def createMsg():
         "message": "Message created {0}".format(roomKey),
     }
 
+
+# (1) Chat list >>> 7geeb el messages mn el profile bta3 el user w ab3tha 
+# (3) w enty btdeefy msg gdeeda 7t7oty m3 el esm el avatar kman 
+# (4) 7t2kedy 3la el user koloooooooooo kol 7aga leeha delete w add
+# (5) 

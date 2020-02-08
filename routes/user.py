@@ -4,14 +4,14 @@ import requests
 from . import routes 
 import re
 
+
+# (2) upload image >>> 7ta5dy mn el user el link bta3 download el image w t7oteh gwa el profile bta3 el user esmo "avatar"
+
+
 #Serch 
 # @routes.route('/searchProfile', methods=['GET'])
 # def searchword():
 #     try:
-
-
-
-
 
 
 #THE REPORT 
@@ -220,19 +220,20 @@ def answersOfQuestions(uid = None):
     answers = request.json.get('answers')
     maxima=-1     #highest value in answers
     
-    for key, value in answers:
+    for key in answers:
+        value = answers[key]
         if (maxima<value):
             maxima=value
     
     x = maxima  # highest percentage skill according to test  
    
-    Naturalist = answers.Naturalist 
-    Musical = answers.Musical
-    Logical = answers.logical
-    Interpersonal = answers.Interpersonal 
-    Kinesthetic = answers.Kinesthetic 
-    Verbal = answers.Verbal
-    visual = answers.visual
+    Naturalist = answers["Naturalist"]
+    Musical = answers["Musical"]
+    Logical = answers["Logical"]
+    Interpersonal = answers["Interpersonal"] 
+    Kinesthetic = answers["Kinesthetic"]
+    Verbal = answers["Verbal"]
+    Visual = answers["Visual"]
     
    
     farwlaya = ""
