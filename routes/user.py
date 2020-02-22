@@ -388,14 +388,13 @@ def answersOfQuestions(uid = None):
     maxima=-1     #highest value in answers
     
     for key in answers:
-        value=answers["{0}".format(key)]
-        
+        value = answers[key]
         if (maxima<value):
             maxima=value
     
     x = maxima  # highest percentage skill according to test  
    
-    Naturalist = answers["Naturalist"] 
+    Naturalist = answers["Naturalist"]
     Musical = answers["Musical"]
     Logical = answers["Logical"]
     Interpersonal = answers["Interpersonal"] 
