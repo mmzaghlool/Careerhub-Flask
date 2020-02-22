@@ -65,8 +65,9 @@ def reportfromuser():
                 "message": "Missing data"
             }
         else:
-            reportfromuser = db.reference(path='Reports/{0}/{1}'.format(uid, timestamp)).set({
+            reportfromuser = db.reference(path='reports/{0}'.format(timestamp)).set({
                 "text": text,
+                "uid": uid
             })
             return {
                 "success": True,
@@ -105,7 +106,6 @@ def addSocialMedia():
             "success": False,
             "message": "{0}".format(DD)
         }, 400  
-
 
 
 #DELETE SOCIAL MEDIA
@@ -175,14 +175,18 @@ def addWork():
         uid=request.json.get('uid')
         description = request.json.get('description')
         title = request.json.get('title')
+        startTimestamp = request.json.get('startTimestamp')
+        endTimestamp = request.json.get('endTimestamp')
         
-        if((uid == None) | (description== None) | (title== None)):
+        if((uid == None) | (description== None) | (title== None) | (startTimestamp== None) | (endTimestamp== None)):
             return {
                 "success": False,
                 "message": "Missing data"
             }
         else: 
             db.reference(path='users/{0}/works'.format(uid)).push({
+                "startTimestamp": startTimestamp,
+                "endTimestamp": endTimestamp,
                 "title": title,
                 "description": description
             })
@@ -253,7 +257,6 @@ def deleteskills(uid = None, key=None):
             "message": "{0}".format(TT)
         }, 400 
 
-
 #update the date 
 @routes.route('/users/updateUser/<uid>', methods=['PUT'])
 def updateUser(uid = None):
@@ -261,22 +264,28 @@ def updateUser(uid = None):
         firstName = request.json.get('firstName')
         lastName = request.json.get('lastName')
         phoneNumber = request.json.get('phoneNumber')
+        email = request.json.get('email')
         
-        # pattern = re.compile("/^[A-Za-z0-9]+$/")
-        # isValidUid = re.search("/^[A-Za-z0-9]+$/", uid)
-        # print(isValidUid)
-
-        # userData = db.reference(path='users/{0}'.format(uid)).get()
-        if ((firstName == None) | (lastName == None) | (phoneNumber == None) | (uid == None)):
+        if ((firstName == None) | (lastName == None) | (phoneNumber == None) | (uid == None) | (email == None)):
             return {
                 "success": False,
                 "message": "wrong or missing data"
             }, 400
         else:
+            # Update user in auth
+            auth.update_user(
+                uid,
+                email= email,
+                phone_number= phoneNumber,
+                # password='newPassword',
+                display_name=firstName + ' ' + lastName)
+
+            # update user in database
             userData = db.reference(path='users/{0}'.format(uid)).update({
                 "firstName": firstName,
                 "lastName": lastName,
-                "phoneNumber": phoneNumber
+                "phoneNumber": phoneNumber,
+                "email": email,
             }) 
             return {
                 "success": True,
@@ -357,10 +366,6 @@ def getUser(uid = None):
             "message": "{0}".format(e)
         }, 400
   
-  
-
-
-#   //////////////
 @routes.route('/users/getQuestions', methods=['GET'])
 def getQuestions():
     try:      
@@ -377,9 +382,6 @@ def getQuestions():
             "message": "{0}".format(e)
         }, 400
 
-
-
-#**************
 @routes.route('/users/answersOfQuestions/<uid>', methods=['POST'])
 def answersOfQuestions(uid = None):
     answers = request.json.get('answers')
@@ -403,7 +405,6 @@ def answersOfQuestions(uid = None):
 
     print("{0}-{1}-{2}-{3}-{4}-{5}-{6}- {7}".format(Naturalist, Musical, Logical, Interpersonal, Kinesthetic, Verbal, visual, x))
     
-   
     farwlaya = ""
     if(x == Naturalist):
         if(Musical >0.5 and Logical > 0.5 and Kinesthetic > 0.5):
@@ -463,19 +464,18 @@ def answersOfQuestions(uid = None):
         "response": farwlaya
     }, 200
 
-
 # upload photo
 @routes.route('/users/uploadAvatar/<uid>', methods=['PUT'])
 def uploadphoto(uid):
-    link = request.json.get('avatar')
-
-    if((link == None)):
-        return {
-            "success": False,
-            "message": "undefined link"
-        }
-    
     try:
+        link = request.json.get('avatar')
+
+        if((link == None)):
+            return {
+                "success": False,
+                "message": "undefined link"
+            }
+
         ref = db.reference(path='users/{0}'.format(uid))
         ref.update({
             'avatar': link
