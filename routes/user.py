@@ -195,13 +195,12 @@ def getUser(uid = None):
 
 
 #   //////////////
-@routes.route('/getQuestions', methods=['GET'])
+@routes.route('/users/getQuestions', methods=['GET'])
 def getQuestions():
     try:      
         # get questions
         questions = db.reference(path='questions').get()
 
-        print('user',userData)
         return {
             "success": True,
             "questions": questions
