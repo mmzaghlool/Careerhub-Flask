@@ -62,7 +62,8 @@ def chatlist(uid):
 
         return {
             "success": True,
-            "message": userMessage
+            "message": "Messanger list sent",
+            "data": userMessage,
         }, 200
     except Exception as NMN:
         return {
