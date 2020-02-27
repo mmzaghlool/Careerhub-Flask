@@ -4,3 +4,5 @@ routes = Blueprint('routes', __name__)
 from .index import *
 from .user import *
 from .Chat import *
+from .Courses import *
+from .Groups import *
