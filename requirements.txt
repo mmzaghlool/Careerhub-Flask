@@ -108,7 +108,7 @@ mccabe==0.6.1
 mistune==0.8.4
 mkl-fft==1.0.6
 mkl-random==1.0.1.1
-mkl-service==2.3.0
+mkl-service==2
 mock==3.0.5
 moment==0.8.2
 more-itertools==7.2.0
