@@ -32,9 +32,6 @@ cloudpickle==1.2.2
 clyent==1.2.1
 colorama==0.4.1
 conda==4.3.16
-conda-build==2.1.5
-conda-package-handling==1.6.0
-conda-verify==3.4.2
 contextlib2==0.6.0
 cryptography==2.7
 cycler==0.10.0
