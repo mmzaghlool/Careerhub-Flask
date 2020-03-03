@@ -1,40 +1,16 @@
-from flask import render_template
 from firebase_admin import auth, db
 from . import routes
-
-
 import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-
-features = ['keywords', 'genres']
-
-
-def combine_features(row):
-    return row['keywords']+" "+row['genres']
-
-
-def get_title_from_index(index, courses):
-    # return df[df.index == index]["title"].values[0]
-    return courses[index]["title"]
-
-
-def get_index_from_title(title):
-    # return df[df.title == title]["index"].values[0]
-
-    course = db.reference(path='courses').order_by_child(
-        'title').equal_to(title).get()
-
-    key = None
-    for key in course:
-        print(key)
-
-    return key
-
-
-@routes.route('/')
+'''
+1. modify algo "store user data in db and change it only when profile changes"
+2. get user data
+3. modify return
+'''
+@routes.route('/rs')
 def index():
     courses = db.reference(path='courses').get()
     # users = db.reference(path='users').get()
@@ -108,3 +84,25 @@ def index():
     return {
         "result": result
     }
+
+features = ['keywords', 'genres']
+def combine_features(row):
+    return row['keywords']+" "+row['genres']
+
+
+def get_title_from_index(index, courses):
+    # return df[df.index == index]["title"].values[0]
+    return courses[index]["title"]
+
+
+def get_index_from_title(title):
+    # return df[df.title == title]["index"].values[0]
+
+    course = db.reference(path='courses').order_by_child(
+        'title').equal_to(title).get()
+
+    key = None
+    for key in course:
+        print(key)
+
+    return key

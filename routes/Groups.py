@@ -9,19 +9,21 @@ import time
 import math
 
 
-# '''
-# 1. enroll in course POST
-# 2. get all courses GET
-# 3. get specific group GET
-# 4. search in courses and profiles GET
-# '''
+'''
+4. search in courses and profiles GET
+5. Leave group DELETE
+6. send message to the group
+7. modify the progress
+8. add community id
+'''
 
 class Groups(MethodView):
-    def get(self, groupID):
+    def get(self, uid, groupID):
         try:
             print('get', groupID)
+
+            # return a list of groups for specific user
             if groupID is None:
-                # return a list of users
                 groups = db.reference(path='groups').get()
 
                 return {
@@ -30,6 +32,7 @@ class Groups(MethodView):
                     "data": groups
                 }, 200
 
+            # return specific group
             else:
                 group = db.reference(path='groups/{0}'.format(groupID)).get()
 
@@ -45,83 +48,13 @@ class Groups(MethodView):
                 "message": "{0}".format(NMN)
             }, 400
 
-    def startNewGroup(self, uid=None, courseID=None, courseData=None, currentTimestamp=None, user=None):
-        print("startNEwGroup")
-        print(courseData)
-        print(currentTimestamp)
-
-        # get new chat key
-        chatKey = db.reference('messages').push({
-            "message": "Chat started",
-            "senderUid": uid
-        }).key
-
-        print("'''''''''chatKey'''''''''")
-        groupKey = db.reference(path='groups').push({
-            "members": {uid: {
-                "name": "{0} {1}".format(user.firstName, user.lastName),
-                "avatar": user.avatar,
-            }},
-            "startTimestamp": currentTimestamp,
-            "chat": chatKey,
-            "Community": 'id',
-            "progress": {uid: {"x": True}},
-            "courseID": courseID
-        }).key
-
-        print(chatKey)
-
-        db.reference('users/{0}/messages/{1}'.format(uid, groupKey)).update({
-            # "avatar": receiverUser["avatar"],
-            "roomKey": chatKey,
-            "name": "{0}".format(courseData["title"])
-        })
-
-        return {
-            "success": True,
-            "message": "Data uploaded",
-        }, 200
-
-
-
-    def joinCurrentGroup(self, uid=None, key=None, courseData=None, lastCourse=None, lastMembers=None, currentTimestamp=None, user=None):
-
-        members = lastCourse["members"]
-        members[uid] = {
-            "name": "{0} {1}".format(user.firstName, user.lastName),
-            "avatar": user.avatar,
-        }
-        lastCourse["members"] = members
-
-        # add user to progress list
-        progress = lastCourse["progress"]
-        progress[uid] = {"x": True}
-        lastCourse["progress"] = progress
-
-        # update data in db
-        db.reference(path='groups/{0}'.format(key)).update(lastCourse)
-
-        # update user chat
-        db.reference('users/{0}/messages/{1}'.format(uid, key)).update({
-            # "avatar": receiverUser["avatar"],
-            "roomKey": lastCourse["chat"],
-            "name": "{0}".format(courseData["title"])
-        })
-
-        db.reference('users/{0}/groups/{1}'.format(uid, key)).update({
-            # TODO make it real
-        })
-        return {
-            "success": True,
-            "message": "Data uploaded",
-        }, 200
-
+    
     # enroll in course
     def post(self):
-
         uid=request.json.get('uid')
         courseID=request.json.get('courseID')
-        print(uid, courseID)
+        print("uid, courseID", uid, courseID)
+
         try:
             # Get course data
             courseData=db.reference(
@@ -155,21 +88,23 @@ class Groups(MethodView):
 
             if ((lastMembers != None) & (lastMembers != None)):
                 if ((lastMembers < 5) & (lastTimestamp < (currentTimestamp + 7*24*60*60))):
-                    return self.joinCurrentGroup(uid, key, courseData, lastCourse, lastMembers, currentTimestamp, user)
+                    return joinCurrentGroup(uid, key, courseData, lastCourse, lastMembers, currentTimestamp, user)
                 else:
-                    return self.startNewGroup(uid, courseID, courseData, currentTimestamp, user)
+                    return startNewGroup(uid, courseID, courseData, currentTimestamp, user)
 
             else:
-                return self.startNewGroup(uid, courseID, courseData, user)
+                return startNewGroup(uid, courseID, courseData, user)
 
         except Exception as NMN:
             print("{0}".format(NMN))
-            # self.startNewGroup(uid    , courseID)
+            # startNewGroup(uid    , courseID)
             return {
                 "success": False,
                 "message": "{0}".format(NMN)
             }, 400
 
+
+    # TODO
     def delete(self, groupID):
         try:
             # delete a single user
@@ -184,6 +119,8 @@ class Groups(MethodView):
                 "message": "{0}".format(NMN)
             }, 400
 
+
+    # TODO
     def put(self, groupID):
         try:
             # update a single user
@@ -212,10 +149,88 @@ class Groups(MethodView):
             }, 400
 
 
+def startNewGroup(uid=None, courseID=None, courseData=None, currentTimestamp=None, user=None):
+    print("startNEwGroup")
+
+    # get new chat key
+    chatKey = db.reference('messages').push({
+        "message": "Chat started",
+        "senderUid": uid
+    }).key
+
+    # Update group data
+    group = {
+        "members": {uid: {
+            "name": "{0} {1}".format(user.firstName, user.lastName),
+            "avatar": user.avatar,
+        }},
+        "startTimestamp": currentTimestamp,
+        "chat": chatKey,
+        "Community": 'id',
+        "progress": {uid: {"x": True}},
+        "courseID": courseID
+    }
+    groupKey = db.reference(path='groups').push(group).key
+
+    print(chatKey)
+
+    # update user data
+    addDataToDB(uid, group, courseData, groupKey)
+
+    return {
+        "success": True,
+        "message": "Data uploaded",
+    }, 200
+        
+
+
+
+def joinCurrentGroup(uid, key, courseData, lastCourse, lastMembers, currentTimestamp, user):
+
+    members = lastCourse["members"]
+    members[uid] = {
+        "name": "{0} {1}".format(user.firstName, user.lastName),
+        "avatar": user.avatar,
+    }
+    lastCourse["members"] = members
+
+    # add user to progress list
+    progress = lastCourse["progress"]
+    progress[uid] = {"x": True}
+    lastCourse["progress"] = progress
+
+    # update data in db
+    db.reference(path='groups/{0}'.format(key)).update(lastCourse)
+
+    addDataToDB(uid, lastCourse, courseData, key)
+    
+    return {
+        "success": True,
+        "message": "Data uploaded",
+    }, 200
+
+
+def addDataToDB(uid, lastCourse, courseData, groupID):
+    # update user chat
+    db.reference('users/{0}/messages/{1}'.format(uid, groupID)).update({
+        # "avatar": receiverUser["avatar"],
+        "roomKey": lastCourse["chat"],
+        "name": "{0}".format(courseData["title"])
+    })
+
+    # update user groups
+    db.reference('users/{0}/groups/{1}'.format(uid, groupID)).update({
+        # "pic": avatar, 
+        "title": courseData["title"],
+        "courseID": courseData["courseID"],
+        "groupID": groupID
+    })
+
+
 # routes.add_url_rule('/courses/', view_func=Courses.as_view('courses'))
 
 user_view=Groups.as_view('groups')
-routes.add_url_rule('/groups/', defaults={'groupID': None},
+routes.add_url_rule('/groups/<string:uid>', defaults={'groupID': None},
                     view_func=user_view, methods=['GET', ])
 routes.add_url_rule('/groups/', view_func=user_view, methods=['POST', ])
 routes.add_url_rule('/groups/<string:groupID>', view_func=user_view,

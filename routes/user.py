@@ -306,6 +306,7 @@ def registerUser():
     email = request.json.get('email')
     password = request.json.get('password')
     phoneNumber = request.json.get('phoneNumber')
+    avatar = request.json.get('avatar')
 
     # check data
     if((firstName == None) | (lastName == None) | (password == None) | (email == None) | (phoneNumber == None)):
@@ -325,12 +326,14 @@ def registerUser():
             disabled=False
         )
 
+
         ref = db.reference(path='users/{0}'.format(user.uid))
         ref.set({
             'email': email,
             'phoneNumber': phoneNumber,
             'firstName': firstName,
             'lastName': lastName,
+            'avatar': avatar
         })
 
         return {

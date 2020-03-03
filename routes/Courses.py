@@ -4,14 +4,6 @@ from firebase_admin import auth, db
 import requests
 from . import routes
 
-# '''
-# 1. enroll in course POST
-# 2. get all courses GET
-# 3. get specific group GET
-# 4. search in courses and profiles GET
-# 5. get course screen
-# '''
-
 class Courses(MethodView):
     def get(self, courseID):
         try:
@@ -84,7 +76,6 @@ class Courses(MethodView):
                 "success": False,
                 "message": "{0}".format(NMN)
             }, 400  
-
 
     def put(self, courseID):
         try:

@@ -6,3 +6,5 @@ from .user import *
 from .Chat import *
 from .Courses import *
 from .Groups import *
+from .Rs import *
+from .Notifications import *
