@@ -24,7 +24,7 @@ class Notifications(MethodView):
             return {
                 "success": False,
                 "message": "{0}".format(NMN)
-            }, 400  
+            }, 400
 
 
     def post(self):
@@ -37,7 +37,7 @@ class Notifications(MethodView):
                 "senderUID": request.json.get('senderUID'),
                 "title": request.json.get('title'), 
                 "body": request.json.get('body'),
-                "avatar": request.json.get('avatar'),
+                "image": request.json.get('image'),
                 "sendTime": currentTimestamp,
             })
 
@@ -55,10 +55,10 @@ class Notifications(MethodView):
         try:
             # delete token
             deviceID = request.json.get('deviceID')
-            db.reference(path='users/{0}/tokens/{1}'.format(uid, deviceID)).delete()
+            db.reference(path='tokens/{0}/{1}'.format(uid, deviceID)).delete()
             return {
                 "success": True,
-                "message": "course deleted",
+                "message": "Token deleted",
             }, 200           
         except Exception as NMN:
             return {
@@ -72,13 +72,13 @@ class Notifications(MethodView):
             playerID = request.json.get('playerID')
 
             # add token to database
-            db.reference(path='users/{0}/tokens'.format(uid)).update({
+            db.reference(path='tokens/{0}'.format(uid)).update({
                 deviceID: playerID
             })
 
             return {
                 "success": True,
-                "message": "Data uploaded",
+                "message": "Token uploaded",
             }, 200           
         except Exception as NMN:
             return {

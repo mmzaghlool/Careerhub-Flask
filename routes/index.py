@@ -34,8 +34,8 @@ def get_index_from_title(title):
     return key
 
 
-@routes.route('/')
-def index():
+@routes.route('/recomendation')
+def recomendation():
     courses = db.reference(path='courses').get()
     # users = db.reference(path='users').get()
 
