@@ -8,7 +8,6 @@ from datetime import datetime
 import time
 import math
 
-
 '''
 4. search in courses and profiles GET
 5. Leave group DELETE
@@ -16,6 +15,7 @@ import math
 7. modify the progress
 8. add community id
 '''
+
 
 class Groups(MethodView):
     def get(self, uid, groupID):
@@ -27,67 +27,65 @@ class Groups(MethodView):
                 groups = db.reference(path='groups').get()
 
                 return {
-                    "success": True,
-                    "message": "Data sent",
-                    "data": groups
-                }, 200
+                           "success": True,
+                           "message": "Data sent",
+                           "data": groups
+                       }, 200
 
             # return specific group
             else:
                 group = db.reference(path='groups/{0}'.format(groupID)).get()
 
                 return {
-                    "success": True,
-                    "message": "Data sent",
-                    "data": group
-                }, 200
+                           "success": True,
+                           "message": "Data sent",
+                           "data": group
+                       }, 200
 
         except Exception as NMN:
             return {
-                "success": False,
-                "message": "{0}".format(NMN)
-            }, 400
+                       "success": False,
+                       "message": "{0}".format(NMN)
+                   }, 400
 
-    
     # enroll in course
     def post(self):
-        uid=request.json.get('uid')
-        courseID=request.json.get('courseID')
+        uid = request.json.get('uid')
+        courseID = request.json.get('courseID')
         print("uid, courseID", uid, courseID)
 
         try:
             # Get course data
-            courseData=db.reference(
+            courseData = db.reference(
                 path='courses/{0}'.format(courseID)).get()
 
             # Get last group assigned to that course
-            lastCourse=db.reference(path='groups').order_by_child(
+            lastCourse = db.reference(path='groups').order_by_child(
                 'courseID').equal_to(courseID).limit_to_last(1).get()
 
-            key=None
+            key = None
             if (lastCourse != None):
                 for key in lastCourse:
                     print(key)
 
             # get last group opened in this course
-            lastTimestamp=None
-            lastMembers=None
-            currentTimestamp=math.floor(time.time())
+            lastTimestamp = None
+            lastMembers = None
+            currentTimestamp = math.floor(time.time())
 
             if (key != None):
-                lastCourse=lastCourse[key]
+                lastCourse = lastCourse[key]
                 # lastCourse = dict(lastCourse)
-                lastMembers=len(lastCourse["members"])
-                lastTimestamp=lastCourse["startTimestamp"]
+                lastMembers = len(lastCourse["members"])
+                lastTimestamp = lastCourse["startTimestamp"]
 
             print("-----------------------------")
             print(lastTimestamp, lastMembers)
 
             user = db.reference('users/{0}'.format(uid)).get()
 
-
             if ((lastMembers != None) & (lastMembers != None)):
-                if ((lastMembers < 5) & (lastTimestamp < (currentTimestamp + 7*24*60*60))):
+                if ((lastMembers < 5) & (lastTimestamp < (currentTimestamp + 7 * 24 * 60 * 60))):
                     return joinCurrentGroup(uid, key, courseData, lastCourse, lastMembers, currentTimestamp, user)
                 else:
                     return startNewGroup(uid, courseID, courseData, currentTimestamp, user)
@@ -99,10 +97,9 @@ class Groups(MethodView):
             print("{0}".format(NMN))
             # startNewGroup(uid    , courseID)
             return {
-                "success": False,
-                "message": "{0}".format(NMN)
-            }, 400
-
+                       "success": False,
+                       "message": "{0}".format(NMN)
+                   }, 400
 
     # TODO
     def delete(self, groupID):
@@ -110,15 +107,14 @@ class Groups(MethodView):
             # delete a single user
             db.reference(path='groups/{0}'.format(groupID)).delete()
             return {
-                "success": True,
-                "message": "course deleted",
-            }, 200
+                       "success": True,
+                       "message": "course deleted",
+                   }, 200
         except Exception as NMN:
             return {
-                "success": False,
-                "message": "{0}".format(NMN)
-            }, 400
-
+                       "success": False,
+                       "message": "{0}".format(NMN)
+                   }, 400
 
     # TODO
     def put(self, groupID):
@@ -139,14 +135,14 @@ class Groups(MethodView):
                 "vote_average": request.json.get('vote_average'),
             })
             return {
-                "success": True,
-                "message": "Data uploaded",
-            }, 200
+                       "success": True,
+                       "message": "Data uploaded",
+                   }, 200
         except Exception as NMN:
             return {
-                "success": False,
-                "message": "{0}".format(NMN)
-            }, 400
+                       "success": False,
+                       "message": "{0}".format(NMN)
+                   }, 400
 
 
 def startNewGroup(uid=None, courseID=None, courseData=None, currentTimestamp=None, user=None):
@@ -178,15 +174,12 @@ def startNewGroup(uid=None, courseID=None, courseData=None, currentTimestamp=Non
     addDataToDB(uid, group, courseData, groupKey)
 
     return {
-        "success": True,
-        "message": "Data uploaded",
-    }, 200
-        
-
+               "success": True,
+               "message": "Data uploaded",
+           }, 200
 
 
 def joinCurrentGroup(uid, key, courseData, lastCourse, lastMembers, currentTimestamp, user):
-
     members = lastCourse["members"]
     members[uid] = {
         "name": "{0} {1}".format(user.firstName, user.lastName),
@@ -203,11 +196,11 @@ def joinCurrentGroup(uid, key, courseData, lastCourse, lastMembers, currentTimes
     db.reference(path='groups/{0}'.format(key)).update(lastCourse)
 
     addDataToDB(uid, lastCourse, courseData, key)
-    
+
     return {
-        "success": True,
-        "message": "Data uploaded",
-    }, 200
+               "success": True,
+               "message": "Data uploaded",
+           }, 200
 
 
 def addDataToDB(uid, lastCourse, courseData, groupID):
@@ -229,7 +222,7 @@ def addDataToDB(uid, lastCourse, courseData, groupID):
 
 # routes.add_url_rule('/courses/', view_func=Courses.as_view('courses'))
 
-user_view=Groups.as_view('groups')
+user_view = Groups.as_view('groups')
 routes.add_url_rule('/groups/<string:uid>', defaults={'groupID': None},
                     view_func=user_view, methods=['GET', ])
 routes.add_url_rule('/groups/', view_func=user_view, methods=['POST', ])
