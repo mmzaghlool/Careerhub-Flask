@@ -2,9 +2,14 @@ from flask import Flask, request, jsonify
 from flask.views import MethodView
 from firebase_admin import auth, db
 import requests
+import json
 from . import routes
 
-class Search(MethodView):
+USERS="users/user"
+POSTS="posts/post"
+COURSES="courses/courses"
+
+class ElasticSearch(MethodView):
     def get(self, courseID):
         try:
             print('get', courseID)
@@ -107,9 +112,73 @@ class Search(MethodView):
 
 # routes.add_url_rule('/courses/', view_func=Courses.as_view('courses'))
 
-user_view = Search.as_view('search')
-routes.add_url_rule('/search/', defaults={'courseID': None},
-                 view_func=user_view, methods=['GET',])
-routes.add_url_rule('/search/', view_func=user_view, methods=['POST',])
-routes.add_url_rule('/search/<string:courseID>', view_func=user_view,
-                 methods=['GET', 'PUT', 'DELETE'])
+view = ElasticSearch.as_view('elasticSearch')
+# routes.add_url_rule('/elasticSearch/', defaults={'courseID': None},
+#                  view_func=view, methods=['GET',])
+# routes.add_url_rule('/elasticSearch/', view_func=view, methods=['POST',])
+routes.add_url_rule('/elasticSearch/index/<string:x>', view_func=view,
+                 methods=['GET', 'PUT', 'DELETE', 'POST'])
+
+
+
+#index all current courses
+@routes.route('/elasticSearch/indexPrev/<index>', methods=['POST'])
+def indexPrev(index):
+    try:
+        data = db.reference(path='{0}'.format(index)).get()
+
+        if index == "users":
+            for uid in data:
+                user = data[uid]
+
+                url = 'http://18.222.72.221:9200/users/user/{0}'.format(uid)
+                obj = {
+                    "firstName": "{0}".format(user["firstName"]),
+                    "lastName": "{0}".format(user["lastName"]),
+                    "email": "{0}".format(user["email"]),
+                    "phoneNumber": "{0}".format(user["phoneNumber"]),
+                    "uid": "{0}".format(uid),
+                }
+                print(obj)
+                print(url)
+                headers = {"Content-Type": "application/json"}
+                x = requests.post(url, data=json.dumps(obj), headers=headers)
+                print(x.text)
+
+        if index == "courses":
+            for key in data:
+                course = data[key]
+                if course == False:
+                    continue
+
+                url = 'http://18.222.72.221:9200/courses/course/{0}'.format(key)
+                obj = {
+                    "director": course["director"],
+                    "genres": course["genres"],
+                    "instructor": course["instructor"],
+                    "keywords": course["keywords"],
+                    "language": course["language"],
+                    "overview": course["overview"],
+                    "title": course["title"],
+                    "url": course["url"],
+                    "vote_average": course["vote_average"],
+                    "vote_count": int(course["vote_count"].replace(",", "")),
+                    "key": key
+                }
+
+                print(obj)
+                print(url)
+                headers = {"Content-Type": "application/json"}
+                x = requests.post(url, data=json.dumps(obj), headers=headers)
+                print(x.text)
+
+        return {
+            "success": True,
+            "message": "Messanger list sent",
+            "data": data
+        }, 200
+    except Exception as NMN:
+        return {
+            "success": False,
+            "message": "{0}".format(NMN)
+        }, 400  

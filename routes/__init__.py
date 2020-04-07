@@ -8,3 +8,5 @@ from .Courses import *
 from .Groups import *
 from .Rs import *
 from .Notifications import *
+from .Search import *
+from .ElasticSearch import *
