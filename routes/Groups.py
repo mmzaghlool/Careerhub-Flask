@@ -22,6 +22,21 @@ class Groups(MethodView):
         try:
             print('get', groupID)
 
+            if uid is not None:
+                result = {}
+                userGroups = db.reference(path='users/{0}/groups'.format(uid)).get()
+
+                for groupID in userGroups:
+                    group = db.reference(path='groups/{0}'.format(groupID)).get()
+                    result[groupID] = group
+
+                return {
+                           "success": True,
+                           "message": "Data sent",
+                           "data": result
+                       }, 200
+
+
             # return a list of groups for specific user
             if groupID is None:
                 groups = db.reference(path='groups').get()
