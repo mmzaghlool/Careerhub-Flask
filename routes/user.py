@@ -326,19 +326,22 @@ def registerUser():
             disabled=False
         )
 
-
-        ref = db.reference(path='users/{0}'.format(user.uid))
-        ref.set({
+        dbUser = {
             'email': email,
             'phoneNumber': phoneNumber,
             'firstName': firstName,
             'lastName': lastName,
-            'avatar': avatar
-        })
+            'avatar': avatar,
+            'uid': user.uid
+        }
+
+        ref = db.reference(path='users/{0}'.format(user.uid))
+        ref.set(dbUser)
 
         return {
             "success": True,
-            "message": "User created"
+            "message": "User created",
+            "user": dbUser
         }
     except Exception as exc:
         return {
