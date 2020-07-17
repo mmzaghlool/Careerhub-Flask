@@ -306,7 +306,6 @@ def registerUser():
     email = request.json.get('email')
     password = request.json.get('password')
     phoneNumber = request.json.get('phoneNumber')
-    avatar = request.json.get('avatar')
 
     # check data
     if((firstName == None) | (lastName == None) | (password == None) | (email == None) | (phoneNumber == None)):
@@ -331,7 +330,7 @@ def registerUser():
             'phoneNumber': phoneNumber,
             'firstName': firstName,
             'lastName': lastName,
-            'avatar': avatar,
+            'avatar': "https://firebasestorage.googleapis.com/v0/b/aiet-bae93.appspot.com/o/avatars%2Fuser.png?alt=media&token=833f7896-e7ca-4377-b34c-a20fd19e32c2",
             'uid': user.uid
         }
 

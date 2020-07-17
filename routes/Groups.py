@@ -226,7 +226,7 @@ def joinCurrentGroup(uid, key, courseData, lastCourse, user, courseID):
 
 def addDataToDB(uid, lastCourse, courseData, groupID, user, courseID):
     # update user chat
-    db.reference('users/{0}/messages/{1}'.format(uid, groupID)).update({
+    db.reference('messagesHeads/{0}/{1}'.format(uid, groupID)).update({
         "avatar": user["avatar"],
         "roomKey": lastCourse["chat"],
         "name": "{0}".format(courseData["title"])
