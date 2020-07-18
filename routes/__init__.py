@@ -9,6 +9,6 @@ from .Groups import *
 from .Rs import *
 from .Notifications import *
 from .chatbot import *
-# from .Search import *
-# from .ElasticSearch import *
+from .Search import *
+from .ElasticSearch import *
 #

@@ -7,7 +7,7 @@ from . import routes
 
 USERS="users/user"
 POSTS="posts/post"
-COURSES="courses/courses"
+COURSES="courses/course"
 
 class ElasticSearch(MethodView):
     def get(self, courseID):
@@ -137,6 +137,7 @@ def indexPrev(index):
                     "lastName": "{0}".format(user["lastName"]),
                     "email": "{0}".format(user["email"]),
                     "phoneNumber": "{0}".format(user["phoneNumber"]),
+                    "avatar": "{0}".format(user["avatar"]),
                     "uid": "{0}".format(uid),
                 }
                 print(obj)
@@ -171,6 +172,32 @@ def indexPrev(index):
                 headers = {"Content-Type": "application/json"}
                 x = requests.post(url, data=json.dumps(obj), headers=headers)
                 print(x.text)
+
+        return {
+            "success": True,
+            "message": "Messanger list sent",
+            "data": data
+        }, 200
+    except Exception as NMN:
+        return {
+            "success": False,
+            "message": "{0}".format(NMN)
+        }, 400  
+
+#index all current courses
+@routes.route('/users/indexUsersAvatar', methods=['POST'])
+def indexUsersAvatar():
+    try:
+        data = db.reference(path='users').get()
+
+
+        for uid in data:
+            user = data[uid]
+
+            if "avatar" not in user.keys():
+                db.reference(path='users/{0}'.format(uid)).update({
+                    "avatar": "https://firebasestorage.googleapis.com/v0/b/aiet-bae93.appspot.com/o/avatars%2Fuser.png?alt=media&token=833f7896-e7ca-4377-b34c-a20fd19e32c2"
+                })
 
         return {
             "success": True,
