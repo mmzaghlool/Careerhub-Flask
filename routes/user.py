@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from firebase_admin import auth, db
 import requests
 from . import routes 
-# import re
+import json
 
 
 #add prexperience
@@ -405,67 +405,84 @@ def answersOfQuestions(uid = None):
     Interpersonal = answers["Interpersonal"] 
     Kinesthetic = answers["Kinesthetic"]
     Verbal = answers["Verbal"]
-    visual = answers["Visual"]
+    Visual = answers["Visual"]
 
-    print("{0}-{1}-{2}-{3}-{4}-{5}-{6}- {7}".format(Naturalist, Musical, Logical, Interpersonal, Kinesthetic, Verbal, visual, x))
-    
+    print("{0}-{1}-{2}-{3}-{4}-{5}-{6}- {7}".format(Naturalist, Musical, Logical, Interpersonal, Kinesthetic, Verbal, Visual, x))
+    # TODO: need courses in network administration, UI/UX, and IT
     farwlaya = ""
     if(x == Naturalist):
         if(Musical >0.5 and Logical > 0.5 and Kinesthetic > 0.5):
-            farwlaya = "Data Administration"
+            farwlaya = "Data Science"
         elif(Interpersonal > 0.5 and Verbal > 0.5 and Interpersonal > 0.5):
             farwlaya="Information Technology"
         else: 
-            farwlaya ="Network Engineer"
+            farwlaya ="Network Administration"
     elif (x == Musical):
         if(Naturalist > 0.5 and Logical > 0.5 and Kinesthetic > 0.5 ):
-            farwlaya ="Data Administration"
+            farwlaya ="Data Science"
         elif(Naturalist > 0.5 and Logical > 0.5):
-            farwlaya ="Network Engineer"
+            farwlaya ="Network Adminentration"
         else: 
             farwlaya ="Mobile Development"
     elif (x == Logical):
         if(Naturalist > 0.5 and Musical > 0.5 and Kinesthetic > 0.5):
-            farwlaya ="Data Administration"
+            farwlaya ="Data Science"
         else:
-            farwlaya ="Network Engineer"
+            farwlaya ="Network Adminentration"
     elif (x == Interpersonal):
         if(Naturalist > 0.5 and Verbal > 0.5 and Interpersonal > 0.5):
             farwlaya ="Information Technology"
         elif(Interpersonal > 0.5 and Kinesthetic >0.5 and Visual > 0.5):
-            farwlaya ="Ui Developer"
+            farwlaya ="UI/UX"
         else: 
-            farwlaya ="Web Developer"
+            farwlaya ="Web Development"
     elif (x == Kinesthetic):
         if(Interpersonal > 0.5 and Interpersonal > 0.5 and Visual > 0.5):
-            farwlaya ="Ui Developer"
+            farwlaya ="UI/UX"
         else:
-            farwlaya ="Data Administration"
+            farwlaya ="Data Science"
     elif (x == Verbal):
         if(Naturalist > 0.5 and Interpersonal > 0.5 and Interpersonal > 0.5):
             farwlaya ="Information Technology"
         elif(Interpersonal > 0.5 and Visual > 0.5):
-            farwlaya ="Web Developer"
+            farwlaya ="Web Development"
         else: 
             farwlaya ="Mobile Development"
     elif (x == Interpersonal):
         if(Naturalist > 0.5 and Interpersonal > 0.5 and Verbal > 0.5):
             farwlaya ="Information Technology"
         else: 
-            farwlaya ="Ui Developer"
+            farwlaya ="UI/UX"
     elif (x == Visual):
         if(Verbal > 0.5 and Musical >0.5 ):
             farwlaya ="Mobile Development"
         elif(Interpersonal > 0.5 and Interpersonal > 0.5 and Kinesthetic > 0.5):
-            farwlaya ="Ui Developer"
+            farwlaya ="UI/UX"
         else: 
-            farwlaya ="Web Developer"
+            farwlaya ="Web Development"
     else: 
         farwlaya ="Take Quiz Again"
 
+    url = 'http://18.222.72.221:9200/courses/course/_search'
+    obj = {
+        "query": {
+            "match_phrase": {
+                "genres":  farwlaya
+            }
+        }
+    }
+
+    headers = {"Content-Type": "application/json"}
+    x = requests.get(url, data=json.dumps(obj), headers=headers)
+
+
+
     return {
         "success": True,
-        "response": farwlaya
+        "result": {
+            "track": farwlaya,
+            "courses": x.text
+        }
     }, 200
 
 # upload photo

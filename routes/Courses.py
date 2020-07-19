@@ -108,8 +108,8 @@ class Courses(MethodView):
 # routes.add_url_rule('/courses/', view_func=Courses.as_view('courses'))
 
 user_view = Courses.as_view('courses')
-routes.add_url_rule('/courses/', defaults={'courseID': None},
+routes.add_url_rule('/courses', defaults={'courseID': None},
                  view_func=user_view, methods=['GET',])
-routes.add_url_rule('/courses/', view_func=user_view, methods=['POST',])
+routes.add_url_rule('/courses', view_func=user_view, methods=['POST',])
 routes.add_url_rule('/courses/<string:courseID>', view_func=user_view,
                  methods=['GET', 'PUT', 'DELETE'])
