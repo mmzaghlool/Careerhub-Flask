@@ -2,9 +2,9 @@ from flask import Blueprint
 routes = Blueprint('routes', __name__)
 
 # from .index import *
-from .user import *
+from .ServerSearch import *
 from .ElasticSearch import *
-from .Search import *
+from .user import *
 from .Chat import *
 from .Courses import *
 from .Groups import *

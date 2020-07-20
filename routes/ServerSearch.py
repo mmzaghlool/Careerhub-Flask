@@ -1,6 +1,4 @@
 from flask import Flask, request, jsonify
-from flask.views import MethodView
-from firebase_admin import auth, db
 import requests
 import json
 from . import routes
