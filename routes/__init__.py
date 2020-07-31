@@ -11,4 +11,5 @@ from .Groups import *
 from .Rs import *
 from .Notifications import *
 from .chatbot import *
+from .Community import *
 #
