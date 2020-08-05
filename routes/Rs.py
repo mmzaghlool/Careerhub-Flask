@@ -10,16 +10,18 @@ from sklearn.metrics.pairwise import cosine_similarity
 2. get user data
 3. modify return
 '''
-@routes.route('/rs')
-def index():
+@routes.route('/rs/<uid>', methods=['GET'])
+def index(uid=None):
     courses = db.reference(path='courses').get()
-    # users = db.reference(path='users').get()
+    userGroups = db.reference(path='users/{0}/groups'.format(uid)).get()
+    # print(courses)
+    print(userGroups)
 
     cfList = []
-
     for df in courses:
-        # df = courses[key]
-        print(df)
+        if df == 'x':
+            continue
+        df = courses[df]
 
         for feature in features:
             if (df[feature] == None):
@@ -31,68 +33,62 @@ def index():
         # courses[key] = df
         cfList.append(df["combined_features"])
 
-    return {
-        "courses": courses,
-        "cfList": cfList,
-
-    };
-    print(cfList)
+    # print("cfList", cfList)
 
     # define CountVectorizer module
     cv = CountVectorizer()
     count_matrix = cv.fit_transform(cfList)
-
     cosine_sim = cosine_similarity(count_matrix)
 
-    print("cosine_sim")
-    print(cosine_sim)
-    print("jaksbdkjasbdkjs")
-    print(len(cosine_sim))
+    user_likes = []
+    if userGroups is not None:
+        for group in userGroups:
+            group = userGroups[group]
+            user_likes.append({
+                "id": group["courseID"],
+                "combined_features": group['keywords']+" "+group['genres']
+            })
 
-    user_likes = "The Ultimate Guide to Game Development with Unity 2019"
+    # user_likes = ["The Ultimate Guide to Game Development with Unity 2019"]
+    
+    print("user_likes", user_likes)
+    if len(user_likes) > 3 :
+        user_likes = user_likes[-3:]
 
-    index = get_index_from_title(user_likes)
-    print("asd as dsa dd s")
-    print(cosine_sim[int(index)])
-    print("index")
-    print(index)
-
-    similar = list(enumerate(cosine_sim[int(index)]))
-
-    print("similar")
-    print(similar)
-
-    sorted_similar = sorted(similar, key=lambda x: x[1], reverse=True)[1:]
-
-    print("sorted_similar")
-    print(sorted_similar)
-
-    i = 0
-    print("Top 5 similar to "+user_likes+" are:\n")
+    print("user_likes", user_likes)
 
     result = []
-    for element in sorted_similar:
-        print(get_title_from_index(element[0], courses))
+    for course in user_likes:
+        # course_index = get_index_from_title(course)
+        similar_courses = list(enumerate(cosine_sim[int(course["id"])]))
+        sorted_similar_courses = sorted(
+            similar_courses, key=lambda x: x[1], reverse=True)[1:]
+        i = 0
+        for element in sorted_similar_courses:
+            # print(get_title_from_index(element[0], courses))
+            result.append(get_title_from_index(element[0], courses))
 
-        result.append( get_title_from_index(element[0], courses))
-        
-
-        i = i+1
-        if i > 5:
-            break
+            i = i+1
+            if i > 2:
+                break
 
     return {
+        "success": True,
         "result": result
     }
 
+
 features = ['keywords', 'genres']
+
+
 def combine_features(row):
     return row['keywords']+" "+row['genres']
 
 
 def get_title_from_index(index, courses):
+    # print(courses)
     # return df[df.index == index]["title"].values[0]
-    return courses[index]["title"]
+    return courses["{0}".format(index)]
 
 
 def get_index_from_title(title):

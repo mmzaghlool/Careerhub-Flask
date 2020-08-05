@@ -28,10 +28,10 @@ class Groups(MethodView):
                 #     result[groupID] = group
 
                 return {
-                           "success": True,
-                           "message": "Data sent",
-                           "data": userGroups
-                       }, 200
+                    "success": True,
+                    "message": "Data sent",
+                    "data": userGroups
+                }, 200
 
             # return specific group
             else:
@@ -39,10 +39,10 @@ class Groups(MethodView):
                 group = db.reference(path='groups/{0}'.format(id)).get()
 
                 return {
-                           "success": True,
-                           "message": "Data sent",
-                           "data": group
-                       }, 200
+                    "success": True,
+                    "message": "Data sent",
+                    "data": group
+                }, 200
 
         except Exception as NMN:
             return {
@@ -187,7 +187,7 @@ def startNewGroup(uid=None, courseID=None, courseData=None, currentTimestamp=Non
         "progress": {uid: {"x": False}},
         "courseID": courseID,
         "instructor": courseData["instructor"],
-        "director": courseData["director"],
+        # "director": courseData["director"],
         "genres": courseData["genres"],
         "language": courseData["language"],
         "title": courseData["title"]
@@ -236,7 +236,8 @@ def addDataToDB(uid, lastCourse, courseData, groupID, user, courseID):
     db.reference('users/{0}/groups/{1}'.format(uid, groupID)).update({
         "title": courseData["title"],
         "instructor": courseData["instructor"],
-        "director": courseData["director"],
+        # "director": courseData["director"],
+        "keywords": courseData["keywords"],
         "genres": courseData["genres"],
         "courseID": courseID
     })

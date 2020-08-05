@@ -408,7 +408,7 @@ def answersOfQuestions(uid = None):
     Visual = answers["Visual"]
 
     print("{0}-{1}-{2}-{3}-{4}-{5}-{6}- {7}".format(Naturalist, Musical, Logical, Interpersonal, Kinesthetic, Verbal, Visual, x))
-    # TODO: need courses in network administration, UI/UX, and IT
+    # TODO: need courses in Network Engineering, UI/UX, and IT
     farwlaya = ""
     if(x == Naturalist):
         if(Musical >0.5 and Logical > 0.5 and Kinesthetic > 0.5):
@@ -416,7 +416,7 @@ def answersOfQuestions(uid = None):
         elif(Interpersonal > 0.5 and Verbal > 0.5 and Interpersonal > 0.5):
             farwlaya="Information Technology"
         else: 
-            farwlaya ="Network Administration"
+            farwlaya ="Network Engineering"
     elif (x == Musical):
         if(Naturalist > 0.5 and Logical > 0.5 and Kinesthetic > 0.5 ):
             farwlaya ="Data Science"
