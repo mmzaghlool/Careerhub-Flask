@@ -247,7 +247,7 @@ class Community(MethodView):
 communityView = Community.as_view('community')
 routes.add_url_rule('/community/<comID>',
                     view_func=communityView, methods=['post', 'get'])
-routes.add_url_rule('/community/<typo>/<postID>',
+routes.add_url_rule('/community/<comID>/<postID>',
                     view_func=communityView, methods=['delete', 'get', 'put'])
 
 
