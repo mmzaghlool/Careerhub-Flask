@@ -408,7 +408,7 @@ def answersOfQuestions(uid = None):
     Visual = answers["Visual"]
 
     print("{0}-{1}-{2}-{3}-{4}-{5}-{6}- {7}".format(Naturalist, Musical, Logical, Interpersonal, Kinesthetic, Verbal, Visual, x))
-    # TODO: need courses in Network Engineering, UI/UX, and IT
+
     farwlaya = ""
     if(x == Naturalist):
         if(Musical >0.5 and Logical > 0.5 and Kinesthetic > 0.5):

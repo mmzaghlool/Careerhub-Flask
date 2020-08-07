@@ -4,7 +4,10 @@ from firebase_admin import auth, db
 import json
 import requests
 from . import routes
+from profanityfilter import ProfanityFilter
 
+pf = ProfanityFilter()
+pf.define_words(["fff", "sss", "shit", "fuck"])
 
 class Community(MethodView):
     def get(self, comID, postID=None):
@@ -66,6 +69,7 @@ class Community(MethodView):
             text = request.json.get('text')
             timeStamp = request.json.get('timeStamp')
             images = request.json.get('images')
+            text = pf.censor(text)
 
             if((uid == None) | (text == None) | (timeStamp == None)):
                 return {

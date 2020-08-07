@@ -2,7 +2,10 @@ from flask import Flask, request, jsonify
 from firebase_admin import auth, db
 import requests
 from . import routes
+from profanityfilter import ProfanityFilter
 
+pf = ProfanityFilter()
+pf.define_words(["fff", "sss", "shit", "fuck"])
 
 @routes.route('/chat/sendMessage', methods=['POST'])
 def createMsg():
@@ -40,7 +43,7 @@ def createMsg():
         })
 
     messageObj = {
-        "message": message,
+        "message": pf.censor(message),
         "senderUid": senderUid
     }
     if (image != None):
